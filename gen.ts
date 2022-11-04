@@ -1,5 +1,5 @@
 import { parse } from "https://deno.land/std@0.162.0/encoding/csv.ts";
-import {join} from "https://deno.land/std@0.162.0/path/mod.ts";
+import { join } from "https://deno.land/std@0.162.0/path/mod.ts";
 import documentDir from "https://deno.land/x/document_dir@0.2.0/mod.ts";
 
 type LangItem = {
@@ -29,18 +29,21 @@ en.forEach(({ ID, Text }, i) => {
   }
 });
 
-const ttcDir = join(documentDir()!, "Elder Scrolls Online/live/AddOns/TamrielTradeCentre")
+const ttcDir = join(documentDir()!, "Elder Scrolls Online/live/AddOns/TamrielTradeCentre");
 const content = await Deno.readTextFile(join(ttcDir, "lang/zh.lua"));
 
 // 替换最后的英文
-const contentZH = content.replaceAll(/ZO_CreateStringId\("TTC_NPC_([A-Z0-9_]+)", "([a-z0-9\-\' ]+)"\)/g, (_, id, en) => {
-  const zh = en2zh.get(en.toLowerCase());
-  if (zh === undefined) {
-    console.warn(`Missing zh.lang.csv: ${en}`);
-    return `ZO_CreateStringId("TTC_NPC_${id}", "${en}")`;
-  }
-  return `ZO_CreateStringId("TTC_NPC_${id}", "${zh}")`;
-});
+const contentZH = content.replaceAll(
+  /ZO_CreateStringId\("TTC_NPC_([A-Z0-9_]+)", "([a-z0-9\-\' ]+)"\)/g,
+  (_, id, en) => {
+    const zh = en2zh.get(en.toLowerCase());
+    if (zh === undefined) {
+      console.warn(`Missing zh.lang.csv: ${en}`);
+      return `ZO_CreateStringId("TTC_NPC_${id}", "${en}")`;
+    }
+    return `ZO_CreateStringId("TTC_NPC_${id}", "${zh}")`;
+  },
+);
 
 await Deno.writeTextFile("./TamrielTradeCentre/lang/zh.lua", contentZH);
 
